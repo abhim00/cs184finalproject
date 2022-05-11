@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Final Project - Face Morpher</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184 Computer Graphics and Imaging, Spring 2022</h1>
+<h1 align="middle">Final Project: Face Morpher</h1>
+<h1 align="middle">Final Report</h1>
+
+<h2 align="middle">Somya Mohindra</h2>
+<h2 align="middle">Anuj Shah</h2>
+<h2 align="middle">Abhishek Mahesh</h2>
+<h2 align="middle">Melody Sifry</h2>
+
+<br><br>
+
+<div align="center">
+    <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/intro.png" align="middle" width="800px"/>
+      </td>
+    </tr>
+    </table>
+</div>
+
+<div>
+<h2 align="left">Abstract</h2>
+
+<p>The objective of this project was to (1) to create an average face, (2) to create a face morphing video graphic, (3) to explore other creative uses of techniques used for (1) and (2), when given two photos of approximately similar area compositions (size of faces in relation to their backgrounds). For this, we need to define the abstract idea of an “average face” as the following: a face whose shape is an average of the shape of two given faces and whose color is an average between the colors on the two faces. </p>
+
+
+<h2 align="left">Technical Approach</h2>
+<p>First, we manually select corresponding facial key points on both images (figure 1, figure 2). The averages of corresponding facial points are taken (figure 3, figure 4) and these average points are subjected to Delaunay triangulation in order to create an optimal face mesh (figure 5, figure 6). 
+    </p><p>Next, we perform the shape morph for each image to the average (figure 7, figure 8) by transforming every triangle in each of the two source meshes to its corresponding triangle in the average mesh. While the forward affine transformation is calculated for each pair of triangles (source to destination), the RGB values of the pixels in the destination image are populated iteratively using the inverse affine transformation of the triangle it is part of. This is a standard practice in computer graphics so as to ensure that there aren’t any black pixels in the destination image, which may occur if a particular pixel is not in the column space of any of the forward affine transformations. This is very possible since there are no constraints in the way triangles are stretched and compressed between the two shapes. We apply bilinear interpolation to get an RGB value for the pixel in the destination image from the source image.
+    </p>
+<div align="center">
+    <table style="width=100%">
+    <tr>
+        <td>
+        <img src="images/1.png" align="middle" width="700px"/>
+        </td>
+    </tr>
+    </table>
+</div>
+<p>Now, we  have two images - the image that arises from source image one being morphed into the average shape and a similar image from source image two. Next, we perform a simple average color morph between these two to get the average face (figure 9).</p>
+<p>To get the face morph video graphic, we first decide the number of frames we’d like to see in this gradual morph. This is an arbitrary number depending on how smooth one wants the morph to look. To create each frame, we repeat the above process with just one difference to the process - we take weighted averages in place of averages everywhere in the process (figure 10).</p>
+<div align="center">
+    <table style="width=100%">
+    <tr>
+        <td>
+        <img src="images/animation.gif" align="middle" width="700px"/>
+        </td>
+    </tr>
+    </table>
+</div>
+<p>In our above approaches, a face is represented solely by its key points and obtaining an average face is simply taking the average of the key points of all the faces included and performing some calculations with these values. What if we found the average face of a population and measured the deviation of a particular face from that average and then exaggerated that deviation. Isn’t that essentially what comic/caricature drawings are - drawings of us with exaggeration of features that are unique to each one of us. This is exactly what we did to create a caricature of Anuj’s face. We used a pre-annotated face set (each face’s facial keypoints were already selected) to compute the average face and performed the above mentioned process between Anuj’s face and the average face to create his caricature (figure 11).
+</p>
+<div align="center">
+    <table style="width=100%">
+    <tr>
+        <td>
+        <img src="images/last.jpg" align="middle" width="500px"/>
+        </td>
+    </tr>
+    </table>
+</div>
+<h2 align="left">Lessons Learned</h2>
+<p>We could have more intelligently picked the initial points of each face: One option would be using a ML model and algorithm instead of manually picking each of the points.  This other option is more sophisticated but would’ve been a better “out-of-the-box” solution. </p><p>The importance of assessing the achievability of a topic before diving in: We switched topics a few times, starting with Real-Time Facial Color Correction, then pivoting to Anisotropic Re-meshing, before finally settling on Face Morphing. We pivoted away from color correction based on our proposal feedback that the problem wasn’t very “graphic-y”. Anisotropic Re-meshing was super interesting, but we realized that the algorithms involved might be too complex to fully implement in the time we had. Finally, we settled on Face Morphing because it was more achievable, but also fun and interesting. 
+</p>
+
+<h2 align="left">References</h2>
+<dl>
+    <dd><a href="https://fei.edu.br/~cet/facedatabase.html">https://fei.edu.br/~cet/facedatabase.html</a></dd>
+    <dd><a href="https://inst.eecs.berkeley.edu/~cs194-26/fa21/hw/proj3/">A guiding inspiration for our project</a></dd>
+    
+  </dl>
+<h2 align="left">Team Contributions</h2>
+<p>We all worked together to decide on a final project topic which was a significant amount of research work in the initial weeks as we changed topics multiple times. After that Anuj worked on finding key points and averaging them, as well as doing the Delaunay triangulation step to create the triangle mesh. Abhi and Somya worked on finding the inverse affine transformations in order to actually do the face shape morph. Melody worked on the face color morph and pulled in the pre-annotated face population data to create the caricatures. We worked together to debug, clean up code, and create the midpoint presentations and websites.
+</p>
+
+<h2 align="left">Final Video, Slides, Link to Repo</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/MRuRiHNQmNA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+<br>
+
+<a href='https://docs.google.com/presentation/d/1MD5UOIFimkQ2phGk0WgeWo_Oz9zl8K00WvPu7qetnZU/edit?usp=sharing'>Slides</a>
+<a href='https://github.com/no4jargon/face-morpher'>Github Repo</a>
+</body>
+</html>
